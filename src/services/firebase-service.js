@@ -1,5 +1,5 @@
 import * as firebase from 'firebase';
-import { FirebaseConfig } from '../config/keys';
+//import { FirebaseConfig } from '../config/keys';
 import _ from 'lodash';
 
 const devFirebaseConfig = {
@@ -50,17 +50,32 @@ export function setMatchups(round, matchups) {
   }
 }
 // Update scores for a single match
-export function updateMatchupScores(currentRound, matchKey, playerScores) {
-  const matchupRef = databaseRef.child(
+// If match has already been submitted then replace score
+// TODO: Replace score if it has already been played
+export async function updateMatchupScores(
+  currentRound,
+  matchKey,
+  playerScores
+) {
+  const matchupRef = await databaseRef.child(
     `matchups/round${currentRound}/${matchKey}`
   );
+  matchupRef.update({ matchPlayed: 1 }); // set match to played
+
   _.map(playerScores, (playerScore, key) => {
     // Update matchup score
     matchupRef
-      .child(`${key}`)
+      .child(`players/${key}`)
       .update({ score: playerScore })
       .then(updatePlayerTotal(key, playerScore));
   });
+  // matchupRef.on('value', snapshot => {
+  //   const matchPlayed = snapshot.val().matchPlayed;
+
+  //   if (Number(matchPlayed) === 0) {
+  //   } else {
+  //   }
+  // });
 }
 // Update the total score for a player
 export function updatePlayerTotal(playerKey, score) {

@@ -71,7 +71,11 @@ export function pairPlayers(round, playersArray) {
     _.map(matchup, player => {
       _.set(player, 'score', 0);
     });
-    matchupArray.push(matchup); // Add matchup to array
+    // Add matchup to array and set boolean to false
+    matchupArray.push({
+      players: matchup,
+      matchPlayed: 0
+    });
     playersArray.splice(0, 2); // Remove pair from player array
   }
   setMatchups(round, matchupArray); // Save matchups to firebase
@@ -127,17 +131,15 @@ export function getSettings() {
 export function areAllMatchesPlayed(matchups, currentRound) {
   //console.log(matchups);
   return dispatch => {
-    let playerHasNoPoints = false;
+    let matchHasntPlayed = false;
     // Looks for any player that has 0 points
     _.map(matchups, matchup => {
-      _.map(matchup, player => {
-        if (Number(player.score) === 0) {
-          playerHasNoPoints = true;
-        }
-      });
+      if (Number(matchup.matchPlayed) === 0) {
+        matchHasntPlayed = true;
+      }
     });
     // Go to next round if all players have points
-    if (!playerHasNoPoints) {
+    if (!matchHasntPlayed) {
       nextRound(currentRound);
     }
   };

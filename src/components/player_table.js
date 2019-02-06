@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
-
+import PropTypes from 'prop-types';
 // Redux
 import { connect } from 'react-redux';
 
@@ -20,25 +20,17 @@ import { getPlayers, getSettings } from '../actions/index';
 
 const styles = theme => ({
   root: {
-    width: '100%',
-    marginTop: theme.spacing.unit * 3,
+    marginTop: 80,
+    margin: -10,
+    // marginTop: theme.spacing.unit * 3,
     overflowX: 'auto'
   }
-  // ,
-  // table: {
-  //   minWidth: 700
-  // }
 });
 
 class PlayerTable extends Component {
-  async componentDidMount() {
-    this.props.getPlayers();
-    this.props.getSettings();
-  }
-
   render() {
     // Object of player names and scores
-    const { players } = this.props;
+    const { players, classes } = this.props;
 
     // SimpleTable.propTypes = { classes: PropTypes.object.isRequired };
 
@@ -63,11 +55,9 @@ class PlayerTable extends Component {
     playersArray.sort((a, b) =>
       b.score > a.score ? 1 : a.score > b.score ? -1 : 0
     );
+
     return (
-      // This doesn't work when I switched to component
-      // <Paper className={classes.root}>
-      // <Table className={classes.table}>
-      <Paper>
+      <Paper className={classes.root}>
         <Table>
           <TableHead>
             <TableRow>
@@ -92,6 +82,9 @@ class PlayerTable extends Component {
     );
   }
 }
+PlayerTable.propTypes = {
+  classes: PropTypes.object.isRequired
+};
 
 function mapStateToProps(state) {
   return {

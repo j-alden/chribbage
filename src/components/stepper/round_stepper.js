@@ -13,31 +13,30 @@ import EnterPlayerForm from './enter_player';
 import MatchupRound from './matchup_round';
 import DisplayWinner from './winner';
 
+//Actions
+import { getSettings, getPlayers } from '../../actions/index';
+
 const styles = theme => ({
   root: {
-    width: '90%'
+    marginTop: 80,
+    margin: -10,
+    borderRadius: '25px'
   },
   button: {
     marginTop: theme.spacing.unit,
     marginRight: theme.spacing.unit
-  },
-  actionsContainer: {
-    marginBottom: theme.spacing.unit * 2
-  },
-  resetContainer: {
-    padding: theme.spacing.unit * 3
   }
 });
 
 function getSteps() {
   return [
-    'Players Enter',
-    'Round 1',
-    'Round 2',
-    'Round 3',
-    'Round 4',
-    'Round 5',
-    'End Results'
+    'Add Players to Tournament',
+    'Matchups: Round 1',
+    'Matchups: Round 2',
+    'Matchups: Round 3',
+    'Matchups: Round 4',
+    'Matchups: Round 5',
+    'Final Results'
   ];
 }
 
@@ -68,11 +67,15 @@ function getStepContent(stepIndex) {
         </div>
       );
     default:
-      return 'Unknown stepIndex';
+      return 'Loading...';
   }
 }
 
 class RoundStepper extends Component {
+  componentDidMount() {
+    this.props.getSettings();
+    this.props.getPlayers();
+  }
   render() {
     const { classes, currentRound } = this.props;
     const steps = getSteps();
@@ -83,32 +86,26 @@ class RoundStepper extends Component {
           {steps.map(label => {
             return (
               <Step key={label}>
-                <StepLabel>{label}</StepLabel>
+                <StepLabel>
+                  <Typography variant='h5'>{label}</Typography>
+                  {/* <span className={classes.steplabel}>{label}</span> */}
+                </StepLabel>
                 <StepContent>
                   <Typography component={'span'}>
                     {getStepContent(currentRound)}
                   </Typography>
-                  <div className={classes.actionsContainer} />
                 </StepContent>
               </Step>
             );
           })}
         </Stepper>
-        {/* {activeStep === steps.length && (
-          <Paper square elevation={0} className={classes.resetContainer}>
-            <Typography>All steps completed - you&apos;re finished</Typography>
-            <Button onClick={this.handleReset} className={classes.button}>
-              Reset
-            </Button>
-          </Paper>
-        )} */}
       </div>
     );
   }
 }
 
 RoundStepper.propTypes = {
-  classes: PropTypes.object
+  classes: PropTypes.object.isRequired
 };
 
 function mapStateToProps(state) {
@@ -119,5 +116,5 @@ function mapStateToProps(state) {
 
 export default connect(
   mapStateToProps,
-  {}
+  { getSettings, getPlayers }
 )(withStyles(styles)(RoundStepper));

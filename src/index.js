@@ -9,12 +9,17 @@ import reduxThunk from 'redux-thunk';
 
 // Styling
 import './index.css';
+import { theme } from './theme';
 
 // Reducers
 import reducers from './reducers';
 
 // Components
 import TwoPanel from './components/layout';
+
+// Material UI
+import CssBaseline from '@material-ui/core/CssBaseline';
+import { MuiThemeProvider } from '@material-ui/core/styles';
 
 const createStoreWithMiddleware = compose(
   applyMiddleware(reduxThunk),
@@ -25,10 +30,11 @@ const createStoreWithMiddleware = compose(
 
 ReactDOM.render(
   <Provider store={createStoreWithMiddleware(reducers)}>
-    <div>
-      <TwoPanel />
-      {/* <Topbar />
-      <SimpleTable /> */}
+    <div className='.new'>
+      <MuiThemeProvider theme={theme}>
+        <CssBaseline />
+        <TwoPanel />
+      </MuiThemeProvider>
     </div>
   </Provider>,
   // This has to match the class in index.html

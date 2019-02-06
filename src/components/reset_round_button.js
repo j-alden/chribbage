@@ -14,10 +14,9 @@ import { resetRound } from '../actions/index';
 const styles = theme => ({
   button: {
     //marginTop: theme.spacing.unit,
-    float: 'right',
     position: 'fixed',
-    right: 0,
-    top: 5
+    top: 5,
+    right: 0
   }
 });
 

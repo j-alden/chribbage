@@ -14,6 +14,7 @@ import { Field, reduxForm } from 'redux-form'; //want to use 'reset'
 
 // Actions
 import { addPlayer, nextRound } from '../../actions/index';
+import { Typography } from '@material-ui/core';
 
 const styles = theme => ({
   container: {
@@ -31,14 +32,16 @@ const styles = theme => ({
   menu: {
     width: 200
   },
-  button: {
-    marginTop: theme.spacing.unit
-  },
   input: {
     display: 'none'
   },
+  addPlayerButton: {
+    marginLeft: theme.spacing.unit * 1,
+    alignSelf: 'center'
+  },
   actionsContainer: {
-    marginBottom: theme.spacing.unit * 2
+    marginBottom: theme.spacing.unit * 2,
+    marginTop: theme.spacing.unit * 2
   }
 });
 
@@ -68,36 +71,47 @@ const EnterPlayerForm = props => {
   } = props;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} autoComplete='off'>
-      <div>
-        <Field
-          name='sevenLetter'
-          component={renderTextField}
-          label='Seven Letter'
-        />
-      </div>
-      <div>
-        <Button type='submit' className={classes.button}>
-          Add Player
-        </Button>
-      </div>
-      <div className={classes.actionsContainer}>
-        <Button
-          // Can't start game without an even number of players
-          disabled={numberPlayers % 2 !== 0 ? true : false}
-          color='primary'
-          variant='contained'
-          // Go to next round when 'Start Game' is clicked
-          // Doesn't work if it's not using a callback function
-          onClick={() => {
-            nextRound(currentRound);
-          }}
-          className={classes.button}
-        >
-          Start Game!
-        </Button>
-      </div>
-    </form>
+    <div>
+      <form onSubmit={handleSubmit(onSubmit)} autoComplete='off'>
+        <Typography variant='body1'>
+          Add players until you're ready to start the tournament! Must have an
+          even number of players to start.
+        </Typography>
+        <div style={{ display: 'inline-flex' }}>
+          <Field
+            name='sevenLetter'
+            component={renderTextField}
+            label='Seven Letter'
+          />
+          <Button
+            type='submit'
+            color='primary'
+            variant='contained'
+            className={classes.addPlayerButton}
+          >
+            Add Player
+          </Button>
+        </div>
+        <div className={classes.actionsContainer}>
+          <Typography variant='subtitle1' gutterBottom>
+            Players Entered: {numberPlayers}
+          </Typography>
+          <Button
+            // Can't start game without an even number of players
+            disabled={numberPlayers % 2 !== 0 ? true : false}
+            variant='contained'
+            // Go to next round when 'Start Game' is clicked
+            // Doesn't work if it's not using a callback function
+            onClick={() => {
+              nextRound(currentRound);
+            }}
+            className={classes.button}
+          >
+            Start Game!
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 };
 

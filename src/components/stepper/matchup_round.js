@@ -12,7 +12,8 @@ import Typography from '@material-ui/core/Typography';
 import Dialog from '@material-ui/core/Dialog';
 import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
-
+import CardHeader from '@material-ui/core/CardHeader';
+import Divider from '@material-ui/core/Divider';
 // Actions
 import {
   pairPlayers,
@@ -34,19 +35,56 @@ const styles = theme => ({
     transform: 'scale(0.8)'
   },
   card: {
-    //minWidth: 200
-    width: '30%',
-    height: 'auto',
     float: 'left',
     margin: '5px',
+    marginBottom: '0px',
     textAlign: 'left',
-    cursor: 'pointer'
+    cursor: 'pointer',
+    '&:hover': {
+      backgroundColor: '#FFEBE6' //theme.palette.secondary.light[50]
+    }
+  },
+  cardHeader: {
+    backgroundColor: theme.palette.primary.light,
+    paddingLeft: theme.spacing.unit * 0.75,
+    paddingRight: theme.spacing.unit * 0.75,
+    paddingTop: theme.spacing.unit * 0.5,
+    paddingBottom: theme.spacing.unit * 0.5
+  },
+  cardContent: {
+    padding: theme.spacing.unit * 0.75,
+    paddingBottom: 0,
+    height: '55px'
   },
   title: {
-    fontSize: 14
+    color: theme.palette.primary.contrastText
   },
-  pos: {
-    marginBottom: 12
+  matchupLeft: {
+    float: 'left',
+    marginRight: theme.spacing.unit * 1
+  },
+  matchupRight: {
+    float: 'right',
+    marginLeft: theme.spacing.unit * 1
+  },
+  matchupsWrapper: {
+    float: 'left',
+    width: '100%'
+  },
+  unplayedMatchups: {
+    float: 'left',
+    //backgroundColor: '#DEEBFF',
+    padding: theme.spacing.unit * 1,
+    width: '100%'
+  },
+  playedMatchups: {
+    float: 'left',
+    padding: theme.spacing.unit * 1,
+    width: '100%'
+    //backgroundColor: '#EBECF0'
+  },
+  divider: {
+    clear: 'both'
   }
 });
 
@@ -61,18 +99,20 @@ const convertPlayersToArray = (playersObject, keyAs) => {
   return playersArray;
 };
 
-function renderMatchup(matchup) {
-  //const { classes } = this.props;
-  //console.log(matchup);
+// Render player name and score in card content
+const renderMatchup = (matchup, classes) => {
   return _.map(matchup, function(player, key) {
-    //return _.map(matchup, function(player, key) {
     return (
       <div key={key}>
-        <Typography>{`${player.name}: ${player.score}`}</Typography>
+        <Typography>
+          <span className={classes.matchupLeft}>{player.name}</span>
+          <span className={classes.matchupRight}>{player.score}</span>
+          <br />
+        </Typography>
       </div>
     );
   });
-}
+};
 
 class MatchupRound extends Component {
   componentDidMount() {
@@ -127,42 +167,113 @@ class MatchupRound extends Component {
       // reset,
       // submitting
     } = this.props;
-    const matchupsObject = _.toPlainObject(matchups);
 
+    const matchupsObject = _.toPlainObject(matchups);
+    let unplayedMatchups = {};
+    let playedMatchups = {};
+
+    // Separate into matches played and not played
+    _.map(matchupsObject, (matchup, key) => {
+      if (Number(matchup.matchPlayed) === 0) {
+        unplayedMatchups[key] = matchup;
+      } else playedMatchups[key] = matchup;
+    });
     if (_.isEmpty(matchups)) {
       return <div>Loading...</div>;
     }
+
     return (
-      <div>
-        {_.map(
-          matchupsObject,
-          (matchup, key) => {
+      <div className={classes.matchupsWrapper}>
+        <div className={classes.unplayedMatchups}>
+          <Typography variant='subtitle2'>Unplayed Matches</Typography>
+          {_.map(unplayedMatchups, (matchup, key) => {
             return (
               <Card
                 key={key}
                 className={classes.card}
-                onClick={() => this.handleClickOpen(matchup, key)}
+                onClick={() => this.handleClickOpen(matchup.players, key)}
               >
-                <CardContent>{renderMatchup(matchup)}</CardContent>
+                <CardHeader
+                  className={classes.cardHeader}
+                  title={
+                    <Typography className={classes.title}>
+                      <span className={classes.matchupLeft}>Player</span>
+                      <span className={classes.matchupRight}>Score</span>
+                    </Typography>
+                  }
+                />
+                <CardContent className={classes.cardContent}>
+                  {renderMatchup(matchup.players, classes)}
+                </CardContent>
               </Card>
             );
-          },
-          this
-        )}
-        <Dialog
-          open={this.state.showModal}
-          onClose={this.handleClose}
-          aria-labelledby='form-dialog-title'
-        >
-          <DialogTitle id='form-dialog-title'>Edit Score of Game</DialogTitle>
-          <DialogContent>
-            <EditScoreForm
-              closeDialog={this.handleClose}
-              matchup={this.state.selectedMatchup}
-              currentRound={currentRound}
-            />
-          </DialogContent>
-        </Dialog>
+          })}
+        </div>
+        <Divider className={classes.divider} />
+        <div className={classes.playedMatchups}>
+          <Typography variant='subtitle2'>Played Matches</Typography>
+          {_.map(playedMatchups, (matchup, key) => {
+            return (
+              <Card
+                key={key}
+                className={classes.card}
+                onClick={() => this.handleClickOpen(matchup.players, key)}
+              >
+                <CardHeader
+                  className={classes.cardHeader}
+                  title={
+                    <Typography className={classes.title}>
+                      <span className={classes.matchupLeft}>Player</span>
+                      <span className={classes.matchupRight}>Score</span>
+                    </Typography>
+                  }
+                />
+                <CardContent className={classes.cardContent}>
+                  {renderMatchup(matchup.players, classes)}
+                </CardContent>
+              </Card>
+            );
+          })}
+
+          {/* {_.map(matchupsObject, (matchup, key) => {
+          return (
+            <Card
+              key={key}
+              className={classes.card}
+              onClick={() => this.handleClickOpen(matchup.players, key)}
+              //onClick={() => this.handleClickOpen(matchup.players, key)}
+            >
+              <CardHeader
+                className={classes.cardHeader}
+                title={
+                  <Typography className={classes.title}>
+                    <span className={classes.matchupLeft}>Player</span>
+                    <span className={classes.matchupRight}>Score</span>
+                  </Typography>
+                }
+              />
+              <CardContent className={classes.cardContent}>
+                {//renderMatchup(matchup.players, classes)
+                renderMatchup(matchup.players, classes)}
+              </CardContent>
+            </Card>
+          );
+        })} */}
+          <Dialog
+            open={this.state.showModal}
+            onClose={this.handleClose}
+            aria-labelledby='form-dialog-title'
+          >
+            <DialogTitle id='form-dialog-title'>Edit Score of Game</DialogTitle>
+            <DialogContent>
+              <EditScoreForm
+                closeDialog={this.handleClose}
+                matchup={this.state.selectedMatchup}
+                currentRound={currentRound}
+              />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
     );
   }

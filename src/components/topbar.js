@@ -3,19 +3,19 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import IconButton from '@material-ui/core/IconButton';
-import MenuIcon from '@material-ui/icons/Menu';
-
 import ResetRoundButton from './reset_round_button';
+import colorlogo from '../assets/card_logo_color.png';
+import { theme } from '../theme';
 
 const styles = {
   root: {
-    flexGrow: 1
+    flexGrow: 1,
+    position: 'fixed',
+    width: '100%'
   },
-  menuButton: {
-    marginLeft: -18,
-    marginRight: 10
+  img: {
+    height: 30,
+    margin: theme.spacing.unit * 1
   }
 };
 
@@ -26,16 +26,7 @@ function Topbar(props) {
     <div className={classes.root}>
       <AppBar position='static'>
         <Toolbar variant='dense'>
-          <IconButton
-            className={classes.menuButton}
-            color='inherit'
-            aria-label='Menu'
-          >
-            <MenuIcon />
-          </IconButton>
-          <Typography variant='h6' color='inherit'>
-            CHRibbage
-          </Typography>
+          <img src={colorlogo} alt='logo' className={classes.img} />
           <ResetRoundButton />
         </Toolbar>
       </AppBar>
