@@ -12,7 +12,8 @@ import {
   setMatchups,
   updateMatchupScores,
   resetPlayers,
-  resetMatchups
+  resetMatchups,
+  updatePlayerTotal
 } from '../services/firebase-service';
 
 // Action Types
@@ -20,7 +21,8 @@ import {
   GET_PLAYERS,
   GET_SETTINGS,
   SET_NUMBER_PLAYERS,
-  GET_MATCHUPS
+  GET_MATCHUPS,
+  GET_ROUND_MATCHUPS
 } from './types';
 
 // Get all entered players
@@ -59,7 +61,6 @@ export function getPlayers() {
 export function pairPlayers(round, playersArray) {
   // Move players into matchupArray as they're paired
   let matchupArray = [];
-
   while (playersArray.length > 0) {
     let matchup = playersArray
       .sort(function() {
@@ -81,15 +82,29 @@ export function pairPlayers(round, playersArray) {
   setMatchups(round, matchupArray); // Save matchups to firebase
 }
 
-export function getMatchups() {
-  return dispatch => {
+export function getAllMatchups() {
+  return async dispatch => {
     // Get matchups
-    matchupsRef.on('value', snapshot => {
+    await matchupsRef.on('value', snapshot => {
       // Assign players to result
       const matchups = snapshot.val();
       dispatch({
         type: GET_MATCHUPS,
         payload: matchups
+      });
+    });
+  };
+}
+
+export function getCurrentRoundMatchups(currentRound) {
+  return async dispatch => {
+    // Get matchups
+    await matchupsRef.child(`round${currentRound}`).on('value', snapshot => {
+      // Assign players to result
+      const currentRoundMatchups = snapshot.val();
+      dispatch({
+        type: GET_ROUND_MATCHUPS,
+        payload: currentRoundMatchups
       });
     });
   };
@@ -126,22 +141,47 @@ export function getSettings() {
   };
 }
 
+// Haveing issues with async call to redux store so switched to below
+//
+// export function areAllMatchesPlayed(matchups, currentRound) {
+//   //console.log(matchups);
+//   return dispatch => {
+//     let matchHasntPlayed = false;
+//     // Looks for any player that has 0 points
+//     _.map(matchups, matchup => {
+//       if (Number(matchup.matchPlayed) === 0) {
+//         matchHasntPlayed = true;
+//       }
+//     });
+//     // Go to next round if all players have points
+//     if (!matchHasntPlayed) {
+//       nextRound(currentRound);
+//     }
+//   };
+// }
+
 // See if all matches for a round are played.
 // If yes, move to next round
-export function areAllMatchesPlayed(matchups, currentRound) {
-  //console.log(matchups);
-  return dispatch => {
-    let matchHasntPlayed = false;
-    // Looks for any player that has 0 points
-    _.map(matchups, matchup => {
-      if (Number(matchup.matchPlayed) === 0) {
-        matchHasntPlayed = true;
+export function areAllMatchesPlayed(currentRound) {
+  return async dispatch => {
+    // Get matchups
+    await matchupsRef.child(`round${currentRound}`).on('value', snapshot => {
+      // Assign players to result
+      let matchHasntPlayed = false;
+      const currentRoundMatchups = snapshot.val();
+
+      if (currentRoundMatchups !== null) {
+        _.map(currentRoundMatchups, matchup => {
+          if (Number(matchup.matchPlayed) === 0) {
+            matchHasntPlayed = true;
+          }
+        });
+        // Go to next round if all players have points
+        if (!matchHasntPlayed) {
+          nextRound(currentRound);
+        }
       }
     });
-    // Go to next round if all players have points
-    if (!matchHasntPlayed) {
-      nextRound(currentRound);
-    }
   };
 }
 
@@ -172,5 +212,15 @@ export function resetGame() {
 export function setMatchScore(currentRound, matchKey, playerScores) {
   updateMatchupScores(currentRound, matchKey, playerScores);
 }
+
+// Reduces player total score by previous amount
+export function replaceMatchupScore(playerScores) {
+  _.map(playerScores, playerScore => {
+    const key = playerScore.id;
+    const score = -Math.abs(playerScore.score); // subtract previous score
+    updatePlayerTotal(key, score);
+  });
+}
+
 // Move to next round if all games played
 export function checkIfAllMatchesArePlayer(currentRound) {}

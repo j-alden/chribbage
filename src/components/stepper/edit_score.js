@@ -15,7 +15,7 @@ import Typography from '@material-ui/core/Typography';
 import { Field, reduxForm } from 'redux-form';
 
 // Actions
-import { setMatchScore } from '../../actions/index';
+import { setMatchScore, replaceMatchupScore } from '../../actions/index';
 
 const styles = theme => ({
   container: {
@@ -48,6 +48,10 @@ const onSubmit = (values, dispatch, props) => {
   const { currentRound, matchup } = props;
   const matchupKey = Object.keys(matchup)[0]; // Grab matchup object key
 
+  if (Number(matchup[matchupKey].matchPlayed) === 1) {
+    // Subtract previously entered score from player's total score
+    replaceMatchupScore(matchup[matchupKey].players);
+  }
   setMatchScore(currentRound, matchupKey, values); // Update score
   props.closeDialog(); // Close dialog
 };
@@ -63,10 +67,12 @@ const EditScoreForm = props => {
     handleSubmit,
     matchup
   } = props;
+  const matchupKey = Object.keys(matchup)[0]; // Key of matchup
+  const matchupPlayers = matchup[matchupKey]; // Access matchup
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} autoComplete='off'>
-      {renderMatchupEdit(matchup)}
+      {renderMatchupEdit(matchupPlayers)}
       <Button color='primary' onClick={props.closeDialog}>
         Cancel
       </Button>

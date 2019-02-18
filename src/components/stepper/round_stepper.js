@@ -19,12 +19,14 @@ import { getSettings, getPlayers } from '../../actions/index';
 const styles = theme => ({
   root: {
     marginTop: 80,
-    margin: -10,
-    borderRadius: '25px'
+    margin: -10
   },
   button: {
     marginTop: theme.spacing.unit,
     marginRight: theme.spacing.unit
+  },
+  stepper: {
+    borderRadius: 4
   }
 });
 
@@ -82,7 +84,11 @@ class RoundStepper extends Component {
 
     return (
       <div className={classes.root}>
-        <Stepper activeStep={currentRound} orientation='vertical'>
+        <Stepper
+          activeStep={currentRound}
+          orientation='vertical'
+          className={classes.stepper}
+        >
           {steps.map(label => {
             return (
               <Step key={label}>

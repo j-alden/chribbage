@@ -26,6 +26,10 @@ class DisplayWinner extends Component {
       b.score > a.score ? 1 : a.score > b.score ? -1 : 0
     );
     const winner = playersArray[0]; // Select winner
+
+    if (winner === null || winner === undefined) {
+      return <div>Loading...</div>;
+    }
     return (
       <div>
         <Typography>

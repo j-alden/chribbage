@@ -42,6 +42,9 @@ const styles = theme => ({
   actionsContainer: {
     marginBottom: theme.spacing.unit * 2,
     marginTop: theme.spacing.unit * 2
+  },
+  playersEntered: {
+    color: theme.palette.secondary.main
   }
 });
 
@@ -93,12 +96,18 @@ const EnterPlayerForm = props => {
           </Button>
         </div>
         <div className={classes.actionsContainer}>
-          <Typography variant='subtitle1' gutterBottom>
+          <Typography
+            variant='subtitle1'
+            gutterBottom
+            className={classes.playersEntered}
+          >
             Players Entered: {numberPlayers}
           </Typography>
           <Button
             // Can't start game without an even number of players
-            disabled={numberPlayers % 2 !== 0 ? true : false}
+            disabled={
+              numberPlayers % 2 !== 0 ? true : false || numberPlayers === 0
+            }
             variant='contained'
             // Go to next round when 'Start Game' is clicked
             // Doesn't work if it's not using a callback function

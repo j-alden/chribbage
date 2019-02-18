@@ -1,5 +1,4 @@
 import React from 'react';
-import { connect } from 'react-redux';
 
 import PropTypes from 'prop-types';
 //import classNames from 'classnames';
@@ -22,14 +21,7 @@ const onClick = values => {
 };
 
 const ResetGameButton = props => {
-  const {
-    classes
-    // numberPlayers,
-    // handleSubmit,
-    // pristine,
-    // reset,
-    // submitting
-  } = props;
+  const { classes } = props;
 
   return (
     <div>
@@ -44,7 +36,4 @@ ResetGameButton.propTypes = {
   classes: PropTypes.object.isRequired
 };
 
-export default connect(
-  null,
-  { resetGame }
-)(withStyles(styles)(ResetGameButton));
+export default withStyles(styles)(ResetGameButton);

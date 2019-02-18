@@ -33,7 +33,6 @@ class PlayerTable extends Component {
     const { players, classes } = this.props;
 
     // SimpleTable.propTypes = { classes: PropTypes.object.isRequired };
-
     if (players == null) {
       return (
         <Paper>
@@ -66,9 +65,19 @@ class PlayerTable extends Component {
             </TableRow>
           </TableHead>
           <TableBody>
-            {playersArray.map(player => {
+            {/* {_.map(players, (player, id) => {
               return (
                 <TableRow key={player.name}>
+                  <TableCell component='th' scope='row'>
+                    {player.name}
+                  </TableCell>
+                  <TableCell align='right'>{player.score}</TableCell>
+                </TableRow>
+              );
+            })} */}
+            {playersArray.map((player, id) => {
+              return (
+                <TableRow key={id}>
                   <TableCell component='th' scope='row'>
                     {player.name}
                   </TableCell>

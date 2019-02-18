@@ -14,14 +14,17 @@ import DialogContent from '@material-ui/core/DialogContent';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import CardHeader from '@material-ui/core/CardHeader';
 import Divider from '@material-ui/core/Divider';
+
 // Actions
 import {
   pairPlayers,
-  getMatchups,
-  areAllMatchesPlayed
+  getAllMatchups,
+  areAllMatchesPlayed,
+  getCurrentRoundMatchups
 } from '../../actions/index';
 
 import EditScoreForm from './edit_score';
+import ReShuffleMatchups from '../reshuffle_matchups';
 
 const styles = theme => ({
   // Something for card here
@@ -69,22 +72,24 @@ const styles = theme => ({
   },
   matchupsWrapper: {
     float: 'left',
-    width: '100%'
+    width: 'auto'
   },
   unplayedMatchups: {
     float: 'left',
     //backgroundColor: '#DEEBFF',
-    padding: theme.spacing.unit * 1,
-    width: '100%'
+    //padding: theme.spacing.unit * 1,
+    width: '100%',
+    marginTop: theme.spacing.unit * 1
   },
   playedMatchups: {
     float: 'left',
-    padding: theme.spacing.unit * 1,
+    paddingTop: theme.spacing.unit * 3,
     width: '100%'
     //backgroundColor: '#EBECF0'
   },
-  divider: {
-    clear: 'both'
+  matchupsHeader: {
+    //color: theme.palette.secondary.green
+    textAlign: 'center'
   }
 });
 
@@ -114,32 +119,34 @@ const renderMatchup = (matchup, classes) => {
   });
 };
 
+// const getCurrentRoundMatchups = (currentRound, matchups) => {};
+
 class MatchupRound extends Component {
-  componentDidMount() {
-    const { matchups, players, currentRound } = this.props;
-    this.props.getMatchups(); // Get all matchups
-    // Need to do this here as well otherwise resetting match doesn't work
-    if (matchups === false) {
-      const playersArray = convertPlayersToArray(players, 'id');
-      pairPlayers(currentRound, playersArray);
-    }
+  async componentDidMount() {
+    const { currentRound } = this.props;
+    await this.props.getAllMatchups(); // Get all matchups
+    await this.props.getCurrentRoundMatchups(currentRound);
   }
 
   // Evaluate when to pair players or move to next round
   componentDidUpdate(prevProps) {
-    const { matchups, players, currentRound } = this.props;
-    if (matchups !== prevProps.matchups) {
-      // If matches exist, check if they're all played
-      // If all matches are played it moves to next round
-      if ((matchups !== undefined) & (matchups !== false)) {
-        this.props.areAllMatchesPlayed(matchups, currentRound);
-      }
-      // If no matches exist, pair players for the round
-      else {
-        // Turn players object into array
-        const playersArray = convertPlayersToArray(players, 'id');
-        // Pair players for round 1
-        pairPlayers(currentRound, playersArray);
+    const { allMatchups, players, currentRound } = this.props;
+    if (allMatchups !== prevProps.allMatchups) {
+      if (allMatchups !== undefined) {
+        if (allMatchups.currentRoundMatchups === null) {
+          // Turn players object into array
+          const playersArray = convertPlayersToArray(players, 'id');
+          // Pair players
+          pairPlayers(currentRound, playersArray);
+        } else {
+          if (
+            allMatchups.currentRoundMatchups !==
+              prevProps.allMatchups.currentRoundMatchups ||
+            currentRound !== prevProps.currentRound
+          ) {
+            this.props.areAllMatchesPlayed(currentRound); // Verify matches are played
+          }
+        }
       }
     }
   }
@@ -161,14 +168,16 @@ class MatchupRound extends Component {
   render() {
     const {
       classes,
-      matchups,
-      currentRound
+      currentRound,
+      players,
+      allMatchups
       // pristine,
       // reset,
       // submitting
     } = this.props;
-
-    const matchupsObject = _.toPlainObject(matchups);
+    const matchupsObject = _.toPlainObject(allMatchups.currentRoundMatchups);
+    // console.log(allMatchups);
+    // console.log(matchupsObject);
     let unplayedMatchups = {};
     let playedMatchups = {};
 
@@ -178,20 +187,29 @@ class MatchupRound extends Component {
         unplayedMatchups[key] = matchup;
       } else playedMatchups[key] = matchup;
     });
-    if (_.isEmpty(matchups)) {
+    if (allMatchups.currentRoundMatchups === null) {
       return <div>Loading...</div>;
     }
 
     return (
       <div className={classes.matchupsWrapper}>
+        <Typography>
+          Select a matchup below to submit a score. Once all of the matches are
+          played the next round will automatically start. You can reshuffle all
+          the matches if none of them have been played.
+        </Typography>
         <div className={classes.unplayedMatchups}>
-          <Typography variant='subtitle2'>Unplayed Matches</Typography>
+          <Typography variant='h6' className={classes.matchupsHeader}>
+            Unplayed Matches
+          </Typography>
+          <Divider variant='middle' />
           {_.map(unplayedMatchups, (matchup, key) => {
             return (
               <Card
                 key={key}
                 className={classes.card}
-                onClick={() => this.handleClickOpen(matchup.players, key)}
+                onClick={() => this.handleClickOpen(matchup, key)}
+                //onClick={() => this.handleClickOpen(matchup.players, key)}
               >
                 <CardHeader
                   className={classes.cardHeader}
@@ -209,15 +227,19 @@ class MatchupRound extends Component {
             );
           })}
         </div>
-        <Divider className={classes.divider} />
+
+        {/* <Divider className={classes.divider} /> */}
         <div className={classes.playedMatchups}>
-          <Typography variant='subtitle2'>Played Matches</Typography>
+          <Typography variant='h6' className={classes.matchupsHeader}>
+            Played Matches
+          </Typography>
+          <Divider variant='middle' />
           {_.map(playedMatchups, (matchup, key) => {
             return (
               <Card
                 key={key}
                 className={classes.card}
-                onClick={() => this.handleClickOpen(matchup.players, key)}
+                onClick={() => this.handleClickOpen(matchup, key)}
               >
                 <CardHeader
                   className={classes.cardHeader}
@@ -234,31 +256,6 @@ class MatchupRound extends Component {
               </Card>
             );
           })}
-
-          {/* {_.map(matchupsObject, (matchup, key) => {
-          return (
-            <Card
-              key={key}
-              className={classes.card}
-              onClick={() => this.handleClickOpen(matchup.players, key)}
-              //onClick={() => this.handleClickOpen(matchup.players, key)}
-            >
-              <CardHeader
-                className={classes.cardHeader}
-                title={
-                  <Typography className={classes.title}>
-                    <span className={classes.matchupLeft}>Player</span>
-                    <span className={classes.matchupRight}>Score</span>
-                  </Typography>
-                }
-              />
-              <CardContent className={classes.cardContent}>
-                {//renderMatchup(matchup.players, classes)
-                renderMatchup(matchup.players, classes)}
-              </CardContent>
-            </Card>
-          );
-        })} */}
           <Dialog
             open={this.state.showModal}
             onClose={this.handleClose}
@@ -274,6 +271,11 @@ class MatchupRound extends Component {
             </DialogContent>
           </Dialog>
         </div>
+        <ReShuffleMatchups
+          disabled={!_.isEmpty(playedMatchups)}
+          players={players}
+          currentRound={currentRound}
+        />
       </div>
     );
   }
@@ -288,15 +290,20 @@ renderMatchup.propTypes = {
 };
 
 function mapStateToProps(state) {
-  const { currentRound } = state.settings;
+  //const { currentRound } = state.settings;
   return {
     players: state.players.players,
     // Use currentRound to determine which matchups for state
-    matchups: state.matchups[`round${currentRound}`]
+    // matchups: state.matchups[`round${currentRound}`],
+    allMatchups: state.matchups
   };
 }
 
 export default connect(
   mapStateToProps,
-  { getMatchups, areAllMatchesPlayed }
+  {
+    getAllMatchups,
+    getCurrentRoundMatchups,
+    areAllMatchesPlayed
+  }
 )(withStyles(styles)(MatchupRound));

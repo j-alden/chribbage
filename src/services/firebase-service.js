@@ -1,4 +1,8 @@
-import * as firebase from 'firebase';
+import firebase from 'firebase/app';
+import 'firebase/app';
+import 'firebase/auth';
+import 'firebase/database';
+
 //import { FirebaseConfig } from '../config/keys';
 import _ from 'lodash';
 
@@ -12,46 +16,31 @@ const devFirebaseConfig = {
 firebase.initializeApp(devFirebaseConfig);
 
 const databaseRef = firebase.database().ref();
-
 export const playersRef = databaseRef.child('players');
 export const settingsRef = databaseRef.child('settings');
 export const matchupsRef = databaseRef.child('matchups');
 
+// Add new player
 export function postPlayer(name) {
-  var rootRef = firebase.database().ref();
-  var playersRef = rootRef.child('players');
-  var newPlayerRef = playersRef.push();
-  newPlayerRef.set({ name: name, score: 0 });
+  const newPlayerRef = playersRef.push().set({ name: name, score: 0 });
   return newPlayerRef;
 }
 
+// Delete player (not implemented)
 export function deletePlayer(playerKey) {
   playersRef.child(playerKey).remove();
 }
 
+// Set current round
 export function setRound(round) {
   settingsRef.update({ currentRound: round });
 }
 
+// Set matchups for given round
 export function setMatchups(round, matchups) {
-  switch (round) {
-    case (round = 1):
-      return matchupsRef.update({ round1: matchups });
-    case (round = 2):
-      return matchupsRef.update({ round2: matchups });
-    case (round = 3):
-      return matchupsRef.update({ round3: matchups });
-    case (round = 4):
-      return matchupsRef.update({ round4: matchups });
-    case (round = 5):
-      return matchupsRef.update({ round5: matchups });
-    default:
-      return null;
-  }
+  matchupsRef.update({ [`round${round}`]: matchups });
 }
-// Update scores for a single match
-// If match has already been submitted then replace score
-// TODO: Replace score if it has already been played
+// Set score for a single match
 export async function updateMatchupScores(
   currentRound,
   matchKey,
@@ -69,13 +58,6 @@ export async function updateMatchupScores(
       .update({ score: playerScore })
       .then(updatePlayerTotal(key, playerScore));
   });
-  // matchupRef.on('value', snapshot => {
-  //   const matchPlayed = snapshot.val().matchPlayed;
-
-  //   if (Number(matchPlayed) === 0) {
-  //   } else {
-  //   }
-  // });
 }
 // Update the total score for a player
 export function updatePlayerTotal(playerKey, score) {
@@ -92,12 +74,8 @@ export function resetPlayers() {
 }
 // Delete all matchups
 export function resetMatchups() {
-  const matchups = firebase.database().ref('matchups');
-
-  // Set all rounds to false otherwise I run into errors
-  matchups.child('round1').set(false);
-  matchups.child('round2').set(false);
-  matchups.child('round3').set(false);
-  matchups.child('round4').set(false);
-  matchups.child('round5').set(false);
+  firebase
+    .database()
+    .ref('matchups')
+    .remove();
 }
