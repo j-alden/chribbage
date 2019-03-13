@@ -21,9 +21,24 @@ export const settingsRef = databaseRef.child('settings');
 export const matchupsRef = databaseRef.child('matchups');
 
 // Add new player
-export function postPlayer(name) {
-  const newPlayerRef = playersRef.push().set({ name: name, score: 0 });
-  return newPlayerRef;
+export function postPlayer(name, callback) {
+  var duplicate = false;
+  playersRef
+    .orderByChild('name')
+    .equalTo(name)
+    .once('value', snapshot => {
+      if (snapshot.exists()) {
+        duplicate = true;
+        callback({ isDuplicate: duplicate });
+      } else {
+        playersRef.push().set({
+          name: name,
+          score: 0
+        });
+        callback({ isDuplicate: duplicate });
+      }
+    });
+  //https://stackoverflow.com/questions/47879534/error-on-then-callback-after-set-data-into-firebase-database-using-node-js
 }
 
 // Delete player (not implemented)

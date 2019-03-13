@@ -10,11 +10,19 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 
 // Redux Form
-import { Field, reduxForm } from 'redux-form'; //want to use 'reset'
+import { Field, reduxForm, reset } from 'redux-form'; //want to use 'reset'
 
 // Actions
-import { addPlayer, nextRound } from '../../actions/index';
+import {
+  addPlayer,
+  nextRound,
+  ToastDashMessage,
+  ToastDashClear
+} from '../../actions/index';
 import { Typography } from '@material-ui/core';
+
+// Components
+import ToastMessage from '../toast_message';
 
 const styles = theme => ({
   container: {
@@ -48,30 +56,32 @@ const styles = theme => ({
   }
 });
 
-const onSubmit = values => {
-  addPlayer(values.sevenLetter, () => {
-    // TO DO: Toast message instead of console log
-    console.log('Player added!');
-    // TO DO: Reset form when player is submitted
-    //this.props.dispatch(reset('EnterPlayerForm'));
-  });
-};
-
-// function handleStartGame(currentRound) =>  {
-//   console.log('CurrentRound: ' + currentRound);
-//   //nextRound(currentRound);
-// }
-
 const EnterPlayerForm = props => {
   const {
     currentRound,
     classes,
     numberPlayers,
-    handleSubmit
+    handleSubmit,
+    toast
     // pristine,
     // reset,
     // submitting
   } = props;
+
+  const onSubmit = (values, dispatch) => {
+    addPlayer(values.sevenLetter, duplicate => {
+      const { isDuplicate } = duplicate;
+      let message;
+      // Determine if player is already entered
+      if (isDuplicate === true) {
+        message = `${values.sevenLetter} is already in the tournament!`;
+      } else {
+        message = `${values.sevenLetter} added to tournament!.`;
+      }
+      dispatch(ToastDashMessage(!isDuplicate, message)); // Display toas message
+      dispatch(reset('EnterPlayerForm')); // Clear input field
+    });
+  };
 
   return (
     <div>
@@ -95,31 +105,38 @@ const EnterPlayerForm = props => {
             Add Player
           </Button>
         </div>
-        <div className={classes.actionsContainer}>
-          <Typography
-            variant='subtitle1'
-            gutterBottom
-            className={classes.playersEntered}
-          >
-            Players Entered: {numberPlayers}
-          </Typography>
-          <Button
-            // Can't start game without an even number of players
-            disabled={
-              numberPlayers % 2 !== 0 ? true : false || numberPlayers === 0
-            }
-            variant='contained'
-            // Go to next round when 'Start Game' is clicked
-            // Doesn't work if it's not using a callback function
-            onClick={() => {
-              nextRound(currentRound);
-            }}
-            className={classes.button}
-          >
-            Start Game!
-          </Button>
-        </div>
       </form>
+      <div className={classes.actionsContainer}>
+        <Typography
+          variant='subtitle1'
+          gutterBottom
+          className={classes.playersEntered}
+        >
+          Players Entered: {numberPlayers}
+        </Typography>
+        <Button
+          // Can't start game without an even number of players
+          disabled={
+            numberPlayers % 2 !== 0 ? true : false || numberPlayers === 0
+          }
+          variant='contained'
+          // Go to next round when 'Start Game' is clicked
+          // Doesn't work if it's not using a callback function
+          onClick={() => {
+            nextRound(currentRound);
+          }}
+          className={classes.button}
+        >
+          Start Game!
+        </Button>
+      </div>
+      <ToastMessage
+        message={toast.dash.message.message}
+        success={toast.dash.message.success}
+        open={toast.dash.open}
+        duration={2500}
+        onClose={() => props.ToastDashClear()}
+      />
     </div>
   );
 };
@@ -197,7 +214,8 @@ EnterPlayerForm.propTypes = {
 function mapStateToProps(state) {
   return {
     numberPlayers: state.players.numberPlayers,
-    currentRound: state.settings.currentRound
+    currentRound: state.settings.currentRound,
+    toast: state.toast
   };
 }
 
@@ -207,6 +225,6 @@ export default reduxForm({
 })(
   connect(
     mapStateToProps,
-    { addPlayer, nextRound }
+    { addPlayer, nextRound, ToastDashMessage, ToastDashClear }
   )(withStyles(styles)(EnterPlayerForm))
 );

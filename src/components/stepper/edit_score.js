@@ -116,6 +116,9 @@ const renderTextField = props => {
           : 'outlined-required outlined-with-placeholder outlined-dense'
       }`}
       //className={classes.textField}
+      type='number'
+      pattern='[0-9]*'
+      inputMode='numeric'
       margin='dense'
       variant='outlined'
       required

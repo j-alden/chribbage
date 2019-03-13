@@ -22,7 +22,9 @@ import {
   GET_SETTINGS,
   SET_NUMBER_PLAYERS,
   GET_MATCHUPS,
-  GET_ROUND_MATCHUPS
+  GET_ROUND_MATCHUPS,
+  TOAST_DASH_MESSAGE,
+  TOAST_DASH_CLEAR
 } from './types';
 
 // Get all entered players
@@ -110,18 +112,6 @@ export function getCurrentRoundMatchups(currentRound) {
   };
 }
 
-// Couldn't do async unless I only got matchups using 'once'
-// export function getMatchups() {
-//   return async dispatch => {
-//     const matchups = await getAllMatchups();
-//     console.log(matchups); // returns undefined
-//     dispatch({
-//       type: GET_MATCHUPS,
-//       payload: matchups
-//     });
-//   };
-// }
-
 // Number of players entered. Need to be even to start
 export function setNumberPlayers(numberPlayers) {
   return dispatch => {
@@ -187,7 +177,11 @@ export function areAllMatchesPlayed(currentRound) {
 
 // Enter a player to play
 export function addPlayer(values, callback) {
-  postPlayer(values).then(() => callback());
+  postPlayer(values, duplicate => {
+    callback(duplicate);
+  });
+
+  //postPlayer(values);
 }
 // Remove an existing player
 export function removePlayer(playerKey) {
@@ -224,3 +218,26 @@ export function replaceMatchupScore(playerScores) {
 
 // Move to next round if all games played
 export function checkIfAllMatchesArePlayer(currentRound) {}
+
+// Show toast message
+export function ToastDashMessage(success, message) {
+  return dispatch => {
+    dispatch({
+      type: TOAST_DASH_MESSAGE,
+      payload: { success: success, message: message }
+    });
+  };
+  // return {
+  //   type: TOAST_DASH_MESSAGE,
+  //   payload: { success: success, message: message }
+  // };
+}
+
+// Hide toast message
+export function ToastDashClear() {
+  return dispatch => {
+    dispatch({
+      type: TOAST_DASH_CLEAR
+    });
+  };
+}

@@ -14,6 +14,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableHead from '@material-ui/core/TableHead';
 import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
+import Checkbox from '@material-ui/core/Checkbox';
 
 // Actions
 import { getPlayers, getSettings } from '../actions/index';
@@ -30,7 +31,15 @@ const styles = theme => ({
 class PlayerTable extends Component {
   render() {
     // Object of player names and scores
-    const { players, classes } = this.props;
+    const {
+      players,
+      classes,
+      onSelectAllClick,
+      order,
+      orderBy,
+      numSelected,
+      rowCount
+    } = this.props;
 
     // SimpleTable.propTypes = { classes: PropTypes.object.isRequired };
     if (players == null) {
@@ -60,21 +69,18 @@ class PlayerTable extends Component {
         <Table>
           <TableHead>
             <TableRow>
+              {/* <TableCell padding='checkbox'>
+                <Checkbox
+                  indeterminate={numSelected > 0 && numSelected < rowCount}
+                  checked={numSelected === rowCount}
+                  onChange={onSelectAllClick}
+                />
+              </TableCell> */}
               <TableCell>Name</TableCell>
               <TableCell align='right'>Score</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {/* {_.map(players, (player, id) => {
-              return (
-                <TableRow key={player.name}>
-                  <TableCell component='th' scope='row'>
-                    {player.name}
-                  </TableCell>
-                  <TableCell align='right'>{player.score}</TableCell>
-                </TableRow>
-              );
-            })} */}
             {playersArray.map((player, id) => {
               return (
                 <TableRow key={id}>
