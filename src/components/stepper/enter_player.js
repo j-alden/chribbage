@@ -78,7 +78,7 @@ const EnterPlayerForm = props => {
       } else {
         message = `${values.sevenLetter} added to tournament!.`;
       }
-      dispatch(ToastDashMessage(!isDuplicate, message)); // Display toas message
+      dispatch(ToastDashMessage(!isDuplicate, message)); // Display toast message
       dispatch(reset('EnterPlayerForm')); // Clear input field
     });
   };

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import skunkIcon from '../../assets/skunk.png';
 //import classNames from 'classnames';
 // lodash
 import _ from 'lodash';
@@ -90,6 +91,10 @@ const styles = theme => ({
   matchupsHeader: {
     //color: theme.palette.secondary.green
     textAlign: 'center'
+  },
+  img: {
+    height: 18,
+    marginLeft: theme.spacing.unit * 0.4
   }
 });
 
@@ -107,10 +112,21 @@ const convertPlayersToArray = (playersObject, keyAs) => {
 // Render player name and score in card content
 const renderMatchup = (matchup, classes) => {
   return _.map(matchup, function(player, key) {
+    let skunk = false;
+    if (player.score > 0 && player.score < 91) {
+      skunk = true;
+    }
     return (
       <div key={key}>
         <Typography>
-          <span className={classes.matchupLeft}>{player.name}</span>
+          <span className={classes.matchupLeft}>
+            {player.name}
+            {skunk ? (
+              <img src={skunkIcon} alt='logo' className={classes.img} />
+            ) : (
+              <></>
+            )}
+          </span>
           <span className={classes.matchupRight}>{player.score}</span>
           <br />
         </Typography>
@@ -203,6 +219,9 @@ class MatchupRound extends Component {
             Unplayed Matches
           </Typography>
           <Divider variant='middle' />
+
+          {/* Games not played */}
+
           {_.map(unplayedMatchups, (matchup, key) => {
             return (
               <Card
@@ -228,7 +247,7 @@ class MatchupRound extends Component {
           })}
         </div>
 
-        {/* <Divider className={classes.divider} /> */}
+        {/* Games already played */}
         <div className={classes.playedMatchups}>
           <Typography variant='h6' className={classes.matchupsHeader}>
             Played Matches

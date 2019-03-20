@@ -48,6 +48,7 @@ class TwoTabsLayout extends Component {
     this.setState({ value });
   };
   render() {
+    console.log(`You're running in ${process.env.NODE_ENV} mode`);
     const { classes } = this.props;
     const { value } = this.state;
 

@@ -41,18 +41,18 @@ export function getPlayers() {
       // Need to have the key to be able to delete the user (maybe can do that without)
       // Maybe can still use object if I can figure out how to reference that when button is clicked
       // Should do this in player_table
-      let playersArray = [];
+      // let playersArray = [];
 
-      for (let player in players) {
-        playersArray.push({
-          id: player,
-          name: player.name,
-          score: player.score
-        });
-      }
-
+      // for (let player in players) {
+      //   playersArray.push({
+      //     id: player,
+      //     name: player.name,
+      //     score: player.score
+      //   });
+      // }
       dispatch({
         type: GET_PLAYERS,
+        //payload: playersArray
         payload: players
       });
     });
@@ -184,8 +184,10 @@ export function addPlayer(values, callback) {
   //postPlayer(values);
 }
 // Remove an existing player
-export function removePlayer(playerKey) {
-  deletePlayer(playerKey);
+export function removePlayer(playerKeys) {
+  _.map(playerKeys, playerKey => {
+    deletePlayer(playerKey);
+  });
 }
 // Move to the next round
 export function nextRound(currentRound) {
