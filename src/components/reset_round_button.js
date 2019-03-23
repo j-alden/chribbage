@@ -34,13 +34,19 @@ const ResetRoundButton = props => {
     // submitting
   } = props;
 
-  return (
-    <div>
-      <Button className={classes.button} onClick={onClick}>
-        Reset Round
-      </Button>
-    </div>
-  );
+  const env = process.env.NODE_ENV;
+  // Only show if in development mode
+  if (env === 'development') {
+    return (
+      <div>
+        <Button className={classes.button} onClick={onClick}>
+          Reset Round
+        </Button>
+      </div>
+    );
+  } else {
+    return <></>;
+  }
 };
 
 ResetRoundButton.propTypes = {

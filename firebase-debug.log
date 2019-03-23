@@ -1,0 +1,44 @@
+[debug] [2019-03-20T22:38:58.625Z] ----------------------------------------------------------------------
+[debug] [2019-03-20T22:38:58.627Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Josh\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js deploy
+[debug] [2019-03-20T22:38:58.627Z] CLI Version:   6.3.0
+[debug] [2019-03-20T22:38:58.627Z] Platform:      win32
+[debug] [2019-03-20T22:38:58.627Z] Node Version:  v8.11.3
+[debug] [2019-03-20T22:38:58.628Z] Time:          Wed Mar 20 2019 17:38:58 GMT-0500 (Central Daylight Time)
+[debug] [2019-03-20T22:38:58.628Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2019-03-20T22:38:58.636Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2019-03-20T22:38:58.637Z] > authorizing via signed-in user
+[debug] [2019-03-20T22:38:58.637Z] [iam] checking project chribbage-dev for permissions ["firebase.projects.get","firebasehosting.sites.update","firebaserules.releases.create","firebaserules.releases.update","firebaserules.rulesets.create"]
+[debug] [2019-03-20T22:38:58.639Z] >>> HTTP REQUEST POST https://cloudresourcemanager.googleapis.com/v1/projects/chribbage-dev:testIamPermissions  
+
+[debug] [2019-03-20T22:38:58.895Z] <<< HTTP RESPONSE 200
+[debug] [2019-03-20T22:38:58.896Z] >>> HTTP REQUEST GET https://firebase.googleapis.com/v1beta1/projects/chribbage-dev  
+ 
+[debug] [2019-03-20T22:38:59.070Z] <<< HTTP RESPONSE 200
+[info] 
+[info] === Deploying to 'chribbage-dev'...
+[info] 
+[info] i  deploying storage, hosting
+[debug] [2019-03-20T22:38:59.078Z] >>> HTTP REQUEST GET https://appengine.googleapis.com/v1/apps/chribbage-dev  
+ 
+[debug] [2019-03-20T22:38:59.395Z] <<< HTTP RESPONSE 200
+[info] i  storage: checking storage.rules for compilation errors...
+[debug] [2019-03-20T22:38:59.397Z] >>> HTTP REQUEST POST https://firebaserules.googleapis.com/v1/projects/chribbage-dev:test  
+
+[debug] [2019-03-20T22:38:59.541Z] <<< HTTP RESPONSE 200
+[info] +  storage: rules file storage.rules compiled successfully
+[debug] [2019-03-20T22:38:59.545Z] >>> HTTP REQUEST POST https://firebasehosting.googleapis.com/v1beta1/sites/chribbage-dev/versions  
+
+[debug] [2019-03-20T22:39:00.237Z] <<< HTTP RESPONSE 200
+[info] i  storage: uploading rules storage.rules...
+[debug] [2019-03-20T22:39:00.239Z] >>> HTTP REQUEST POST https://firebaserules.googleapis.com/v1/projects/chribbage-dev/rulesets  
+
+[debug] [2019-03-20T22:39:00.434Z] <<< HTTP RESPONSE 200
+[debug] [2019-03-20T22:39:00.434Z] [rules] created ruleset projects/chribbage-dev/rulesets/5c460dee-0009-4b7f-aba9-498477028e28
+[info] i  hosting[chribbage-dev]: beginning deploy...
+[info] i  hosting[chribbage-dev]: found 18 files in build
+[debug] [2019-03-20T22:39:00.451Z] [hosting] hash cache [YnVpbGQ] load error: lines is not defined
+[debug] [2019-03-20T22:39:01.063Z] [hosting] hash cache [YnVpbGQ] stored for 18 files
+[debug] [2019-03-20T22:39:01.063Z] [hosting][hash queue][FINAL]
+[debug] [2019-03-20T22:39:01.063Z] >>> HTTP REQUEST POST https://firebasehosting.googleapis.com/v1beta1/sites/chribbage-dev/versions/c8d455db0a238de8:populateFiles  
+ <request body omitted>

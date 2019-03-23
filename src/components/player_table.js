@@ -50,26 +50,12 @@ const EnhancedTableHeadStyles = theme => ({
 
 class EnhancedTableHead extends React.Component {
   render() {
-    const {
-      //onSelectAllClick,
-      order,
-      orderBy,
-      classes
-    } = this.props;
+    const { order, orderBy, classes } = this.props;
 
     return (
       <TableHead className={classes.root}>
         <TableRow>
-          <TableCell padding='checkbox'>
-            {
-              // NOTE - Disabled select all
-              /* <Checkbox
-              indeterminate={numSelected > 0 && numSelected < rowCount}
-              checked={numSelected === rowCount}
-              onChange={onSelectAllClick}
-            /> */
-            }
-          </TableCell>
+          <TableCell padding='checkbox' />
           {rows.map(
             row => (
               <TableCell
@@ -93,7 +79,6 @@ EnhancedTableHead = withStyles(EnhancedTableHeadStyles)(EnhancedTableHead);
 
 EnhancedTableHead.propTypes = {
   numSelected: PropTypes.number.isRequired,
-  //onSelectAllClick: PropTypes.func.isRequired,
   order: PropTypes.string.isRequired,
   orderBy: PropTypes.string.isRequired
 };
@@ -128,9 +113,10 @@ let EnhancedTableToolbar = props => {
   const { numSelected, classes, selectedKeys } = props;
 
   const handleDelete = () => {
+    // Removes player from firebase
     removePlayer(selectedKeys);
+    // Resets row selection
     props.resetSelection();
-    //call function passed down from props to clear selected rows
   };
 
   return (
@@ -177,7 +163,6 @@ EnhancedTableToolbar = withStyles(toolbarStyles)(EnhancedTableToolbar);
 
 const styles = theme => ({
   root: {
-    //marginTop: theme.spacing.unit * 3,
     marginTop: 80,
     margin: -10,
     overflowX: 'auto'
@@ -186,7 +171,6 @@ const styles = theme => ({
     overflowX: 'auto'
   },
   checkbox: {
-    //padding: 0,
     margin: 0,
     width: 10 // For some reason this works to make checkbox spacing work
   },
@@ -208,16 +192,6 @@ class PlayerTable extends Component {
   componentDidMount() {
     this.props.getPlayers();
   }
-
-  // NOTE - Disabled select all
-  // handleSelectAllClick = event => {
-  //   if (event.target.checked) {
-  //     this.setState(state => ({ selected: state.data.map(n => n.id) }));
-  //     //this.setState(state => ({ selected: state.data.map(n => n.id) }));
-  //     return;
-  //   }
-  //   this.setState({ selected: [] });
-  // };
 
   handleClick = (event, id, key) => {
     const { selected, selectedKeys } = this.state;
@@ -274,7 +248,6 @@ class PlayerTable extends Component {
       players,
       classes,
       toast,
-      //onSelectAllClick,
       currentRound
       //rowCount
     } = this.props;
@@ -289,26 +262,9 @@ class PlayerTable extends Component {
             Enter players in the tournament to start!
           </Typography>
         </Paper>
-        // <div>
-        //   <p>enter players</p>
-        //   <Paper>
-        //     <Table>
-        //       <TableHead>
-        //         <TableRow>
-        //           <TableCell>Name</TableCell>
-        //           <TableCell align='right'>Score</TableCell>
-        //         </TableRow>
-        //       </TableHead>
-        //       <TableBody />
-        //     </Table>
-        //   </Paper>
-        // </div>
       );
     }
-
     // Convert to array for table
-    //const playersArray = _.values(players);
-
     const playersArray = _.map(players, (value, key) => ({
       key: key,
       name: value.name,
@@ -331,7 +287,6 @@ class PlayerTable extends Component {
               numSelected={selected.length}
               order={order}
               orderBy={orderBy}
-              //onSelectAllClick={this.handleSelectAllClick}
             />
 
             <TableBody>
